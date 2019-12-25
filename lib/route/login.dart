@@ -1,5 +1,7 @@
 import 'package:eco_connect_app/classes/custom-clip.dart';
 import 'package:eco_connect_app/model/design.dart';
+import 'package:eco_connect_app/route/signup.dart';
+import 'package:eco_connect_app/services/api.dart';
 import 'package:flutter/material.dart';
 
 
@@ -9,11 +11,61 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
+  final _formKey = new GlobalKey<FormState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+
+  String _phone;
+  String _password;
+  bool _isWorking = false;
+  String token = '';
+
+  void showInSnackBar(String value) {
+    _scaffoldKey.currentState.showSnackBar(new SnackBar(content: new Text(value),
+    backgroundColor: Colors.red[400]
+    ));
+}
+_isLoading(){
+      setState((){
+        _isWorking = true;
+      });
+    }
+    _isNotLoading(){
+      setState((){
+        _isWorking= false;
+      });
+    }
+
+     validate() async {
+    final form = _formKey.currentState;
+    if (form.validate()) {
+      _isLoading();
+      _formKey.currentState.save();
+      try{
+        var result = await ApiService.postData({'phone': _phone, 'password': _password }, 'api/v1/login');
+        if (result.containsKey('token')) {
+          token =result['token'].toString();
+          print(result);
+          
+                  } else {
+                    _isNotLoading();
+                    showInSnackBar(result['error'].toString());
+                  }
+      }catch(e){
+       _isNotLoading();
+       showInSnackBar('Service not available, please try again later');
+      }
+      } else {
+                
+                print('form is invalid');
+              }
+       
+            }
 
   @override
   Widget build(BuildContext context) {
     Design mStyle = new Design(context);
     return Scaffold(
+      key: _scaffoldKey,
       body:Container(
       
       color: Theme.of(context).primaryColor,
@@ -69,19 +121,26 @@ class _LoginState extends State<Login> {
                           )
                         ]
                       ),
-                      child: Column(
+                      child: Form(
+                        key: _formKey,
+                        child:
+                      Column(
                         children: <Widget>[
                           Container(
                             padding: EdgeInsets.all(10),
                             decoration: BoxDecoration(
                               border: Border(bottom: BorderSide(color: Colors.grey[200]))
                             ),
-                            child: TextField(
+                            child: TextFormField(
                               decoration: InputDecoration(
                                 hintText: 'Phone Number',
                                 hintStyle: TextStyle(color: Colors.grey),
                                 border: InputBorder.none
                               ),
+                              validator: (value)=> value.isEmpty
+                              ? 'Phone number can\'t be empty': null,
+                              onSaved: (value) => _phone = value,
+                              keyboardType: TextInputType.phone,
                             ),
                           ),
                           Container(
@@ -89,20 +148,51 @@ class _LoginState extends State<Login> {
                             decoration: BoxDecoration(
                               border: Border(bottom: BorderSide(color: Colors.grey[200]))
                             ),
-                            child: TextField(
+                            child: TextFormField(
+                              obscureText: true,
                               decoration: InputDecoration(
                                 hintText: 'Password',
                                 hintStyle: TextStyle(color: Colors.grey),
                                 border: InputBorder.none
                               ),
+                              validator: (value)=> value.isEmpty ?
+                              'Password can\'t be empty': null,
+                              onSaved: (value)=> _password = value,
+                              keyboardType: TextInputType.text,
                             ),
                           ),
                         ])
+                    )
                   ),
                   SizedBox(
                       height: mStyle.getheigth(val: 5),
                     ),
-                  Container(
+                   Container(
+                              child: Visibility(
+                                visible:_isWorking,
+                                child: Container(
+                                  //padding: EdgeInsets.only(top: 20.0, left: 80.0),
+                                  child: Center(
+                                    child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                ),),
+          
+                                replacement: Expanded(
+                                    child: Padding(
+                                  padding: EdgeInsets.only(
+                                      top: 20.0, left: 25.0,),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      validate();
+                                    },
+                                    child: Container(
+                                        alignment: Alignment.center,
+                                        height:50,
+                                        decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius: BorderRadius.circular(25.0)),
+                                        child: Container(
                       height: mStyle.getheigth(val: 8),
                       margin: EdgeInsets.symmetric(horizontal: 50),
                       decoration: BoxDecoration(
@@ -111,15 +201,28 @@ class _LoginState extends State<Login> {
                       ),
                       
                         child:  Center(
-                        child: Text('Login', style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),),
+                        child: 
+                        Text('Login', style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),),
                       ),
                       ),
+                                  ),
+                                )),
+                              ),
+                            ),
+                   ),
+
+
+                  
 
 
                    SizedBox(
                       height: mStyle.getheigth(val: 5),
                     ),
-                     Center(child: Text('Create an Account', style:TextStyle(color: Colors.grey[600], fontSize: 17, fontWeight: FontWeight.bold))),
+                     Center(child:
+                     GestureDetector(
+                       onTap: (){ Navigator.push(context, MaterialPageRoute(builder: (context)=> Signup())); },
+                       child: Text('Register', style:TextStyle(color: Colors.grey[600], fontSize: 17, fontWeight: FontWeight.bold))),
+                     ) 
                    
                     
                   ],

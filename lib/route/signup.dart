@@ -1,5 +1,6 @@
 import 'package:eco_connect_app/classes/custom-clip.dart';
 import 'package:eco_connect_app/model/design.dart';
+import 'package:eco_connect_app/services/api.dart';
 import 'package:flutter/material.dart';
 
 class Signup extends StatefulWidget {
@@ -8,19 +9,104 @@ class Signup extends StatefulWidget {
 }
 
 class _SignupState extends State<Signup> {
+  final _userForm = new GlobalKey<FormState>();
+  final GlobalKey<ScaffoldState>_scaffoldKey = new GlobalKey<ScaffoldState>();
+  bool _isWorking = false;
 
   List<String> _gender = ['Male', 'Female'];
   List<String> _state = ['Edo'];
   List<String> _cities = ['Abudu', 'Afuze', 'Auchi', 'Benin City', 'Ekpoma', 'Ewu', 'Fugar', 'Ibillo', 'Igarra', 'Igueben', 'Irrua', 'Okpella', 'Sabongida-Ora', 'Ubiaja', 'Urhonigbe', 'Uromi', 'Uzebba'];
+  
+  void showInSnackBar(String value) {
+    _scaffoldKey.currentState.showSnackBar(new SnackBar(content: new Text(value),
+    backgroundColor: Colors.red[400]
+    ));
+}
+
+   _isLoading(){
+      setState((){
+        _isWorking = true;
+      });
+    }
+    _isNotLoading(){
+      setState((){
+        _isWorking= false;
+      });
+    }
+  
   String _selectedState;
   String _selectedCity;
   String _selectedGender;
+  
+
+  // initalization of user details..
+  String _firstname;
+  String _lastname;
+  String _phone;
+  String _email;
+  String _usertype;
+  String _password;
+
+  String _dropdownGender;
+  String _dropdownCity;
+  String _dropdownState;
+
+  validateUser() async {
+    final userForm = _userForm.currentState;
+    if (_selectedGender == null) {
+      setState(() => _dropdownGender = "Please select a gender!");
+      return false;
+    }
+    if (_selectedState == null) {
+      setState(() => _dropdownState = "Please select a State!");
+      return false;
+    }
+    if (_selectedCity == null) {
+      setState(() => _dropdownCity = "Please select a city!");
+      return false;
+    }
+      if (userForm.validate()) {
+        _isLoading();
+        _userForm.currentState.save();
+        if(_email.isEmpty){
+          _email = 'null';
+        }
+        
+        final data = {
+          'firstname': _firstname,
+          'lastname': _lastname,
+          'phone' : _phone,
+          'email': _email,
+          'password': _password,
+          'usertype': 'client',
+          'gender': _selectedGender,
+          'state': _selectedState,
+          'city': _selectedCity
+
+        };
+        print(data);
+        var result = await ApiService.postData(data, 'api/v1/signup');
+         if (result.containsKey('data')) {
+           print(result);
+          // Navigator.push(context, MaterialPageRoute(
+          //   builder: (context)=> Dashboard(user)
+          // ));
+        } else {
+          _isNotLoading();
+          showInSnackBar(result['error'].toString());
+        }
+      } else {
+        print('form is invalid');
+      }
+    }
+
   @override
   Widget build(BuildContext context) {
     
     Design mStyle = new Design(context);
     return Scaffold(
-        body: Container(
+      key: _scaffoldKey,
+      body: Container(
       color: Theme.of(context).primaryColor,
       height: mStyle.getheigth(),
       child: ListView(
@@ -47,12 +133,14 @@ class _SignupState extends State<Signup> {
           Container(
             color: Colors.white,
             padding: EdgeInsets.all(20),
-            child: Column(
+            child:Form(
+              key: _userForm,
+              child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisSize: MainAxisSize.max,
               children: <Widget>[
                 Text(
-                  "Create Account",
+                  "Create an Account",
                   style: TextStyle(
                       fontSize: 18, color: Theme.of(context).primaryColor),
                 ),
@@ -76,11 +164,14 @@ class _SignupState extends State<Signup> {
                         decoration: BoxDecoration(
                             border: Border(
                                 bottom: BorderSide(color: Colors.grey[200]))),
-                        child: TextField(
+                        child: TextFormField(
                           decoration: InputDecoration(
                               hintText: 'First Name',
                               hintStyle: TextStyle(color: Colors.grey),
                               border: InputBorder.none),
+                              validator: (value) => value.isEmpty ? 
+                              'First Name is required': null,
+                              onSaved: (value) => _firstname = value,
                         ),
                       ),
                       Container(
@@ -88,11 +179,14 @@ class _SignupState extends State<Signup> {
                         decoration: BoxDecoration(
                             border: Border(
                                 bottom: BorderSide(color: Colors.grey[200]))),
-                        child: TextField(
+                        child: TextFormField(
                           decoration: InputDecoration(
                               hintText: 'Last Name',
                               hintStyle: TextStyle(color: Colors.grey),
                               border: InputBorder.none),
+                              validator: (value) => value.isEmpty ?
+                              'Last Name is required': null,
+                              onSaved: (value) => _lastname = value,
                         ),
                       ),
                       Container(
@@ -100,11 +194,15 @@ class _SignupState extends State<Signup> {
                         decoration: BoxDecoration(
                             border: Border(
                                 bottom: BorderSide(color: Colors.grey[200]))),
-                        child: TextField(
+                        child: TextFormField(
                           decoration: InputDecoration(
                               hintText: 'Phone Number',
                               hintStyle: TextStyle(color: Colors.grey),
                               border: InputBorder.none),
+                              validator: (value) => value.isEmpty ? 
+                              'Phone number is required': null,
+                              onSaved: (value) => _phone = value,
+                              keyboardType: TextInputType.phone,
                         ),
                       ),
                       Container(
@@ -112,11 +210,12 @@ class _SignupState extends State<Signup> {
                         decoration: BoxDecoration(
                             border: Border(
                                 bottom: BorderSide(color: Colors.grey[200]))),
-                        child: TextField(
+                        child: TextFormField(
                           decoration: InputDecoration(
                               hintText: 'Email Address (optional)',
                               hintStyle: TextStyle(color: Colors.grey),
                               border: InputBorder.none),
+                              onSaved: (value)=> _email = value,
                         ),
                       ),
                        Container(
@@ -141,6 +240,7 @@ class _SignupState extends State<Signup> {
                         
                         setState(() {
                           _selectedGender = newValue;
+                          _dropdownGender = null;
                          
                         });
                       },
@@ -156,6 +256,12 @@ class _SignupState extends State<Signup> {
                       }).toList(),
                     ),),
                     ),
+                    _dropdownGender == null
+              ? SizedBox.shrink()
+              : Text(
+            _dropdownGender ?? "",
+            style: TextStyle(color: Colors.red), textAlign: TextAlign.right,
+          ),
                   
                       Container(
                         padding: EdgeInsets.all(10),
@@ -179,6 +285,7 @@ class _SignupState extends State<Signup> {
                         
                         setState(() {
                           _selectedState = newValue;
+                          _dropdownState = null;
                          
                         });
                       },
@@ -194,6 +301,12 @@ class _SignupState extends State<Signup> {
                       }).toList(),
                     ),),
                     ),
+                    _dropdownState == null
+              ? SizedBox.shrink()
+              : Text(
+            _dropdownState ?? "",
+            style: TextStyle(color: Colors.red), textAlign: TextAlign.right,
+          ),
                       Container(
                         padding: EdgeInsets.all(10),
                         decoration: BoxDecoration(
@@ -216,6 +329,7 @@ class _SignupState extends State<Signup> {
                         
                         setState(() {
                           _selectedCity = newValue;
+                          _dropdownCity = null;
                          
                         });
                       },
@@ -231,49 +345,88 @@ class _SignupState extends State<Signup> {
                       }).toList(),
                     ),),
                     ),
+                    _dropdownCity == null
+              ? SizedBox.shrink()
+              : Text(
+            _dropdownCity ?? "",
+            style: TextStyle(color: Colors.red), textAlign: TextAlign.right,
+          ),
                       Container(
                         padding: EdgeInsets.all(10),
                         decoration: BoxDecoration(
                             border: Border(
                                 bottom: BorderSide(color: Colors.grey[200]))),
-                        child: TextField(
+                        child: TextFormField(
+                          obscureText: true,
                           decoration: InputDecoration(
                               hintText: 'Password',
                               hintStyle: TextStyle(color: Colors.grey),
                               border: InputBorder.none),
+                              validator: (value) => value.isEmpty? 
+                              'Password is required': null,
+                              onSaved: (value) => _password = value,
                         ),
                       ),
                     ])),
                 SizedBox(
                   height: mStyle.getheigth(val: 5),
                 ),
+
                 Container(
-                  height: mStyle.getheigth(val: 8),
-                  margin: EdgeInsets.symmetric(horizontal: 50),
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(30),
-                      color: Theme.of(context).primaryColor),
-                  child: Center(
-                    child: Text(
-                      'Create an Account',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ),
+                              child: Visibility(
+                                visible:_isWorking,
+                                child: Container(
+                                  //padding: EdgeInsets.only(top: 20.0, left: 80.0),
+                                  child: Center(
+                                    child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                ),),
+          
+                                replacement: Container(
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      validateUser();
+                                    },
+                                    child: Container(
+                                        alignment: Alignment.center,
+                                        height:50,
+                                        decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius: BorderRadius.circular(25.0)),
+                                        child: Container(
+                      height: mStyle.getheigth(val: 8),
+                      margin: EdgeInsets.symmetric(horizontal: 50),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(30),
+                        color: Theme.of(context).primaryColor
+                      ),
+                      
+                        child:  Center(
+                        child: 
+                        Text('Register', style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),),
+                      ),
+                      ),
+                                  ),
+                                )),
+                              ),
+                            ),
+
+
                 SizedBox(
                   height: mStyle.getheigth(val: 5),
                 ),
                 Center(
-                    child: Text('Login Instead?',
+                    child: Text('SignIn Instead?',
                         style: TextStyle(
                             color: Colors.grey[600],
                             fontSize: 17,
                             fontWeight: FontWeight.bold))),
               ],
             ),
+              )
+            
+             
           )
         ],
       ),
