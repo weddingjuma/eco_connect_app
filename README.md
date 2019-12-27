@@ -10,6 +10,10 @@ This user application was created using flutter v0.0.6
 
 This application get it resource from a RESTFul API at https://ecoconnect.herokuapp.com
 
+## Application Stagging URL
+
+https://drive.google.com/file/d/1EQPOUY7zZ7kcgE_wgYRL5rKGfM6i1YoZ/view?usp=sharing
+
 ## Screenshots
 
 - Splash Screen 
