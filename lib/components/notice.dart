@@ -1,12 +1,51 @@
 import 'package:eco_connect_app/model/design.dart';
+import 'package:eco_connect_app/services/api.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Notice extends StatefulWidget {
+  final user;
+  Notice(this.user);
   @override
-  _NoticeState createState() => _NoticeState();
+  _NoticeState createState() => _NoticeState(this.user);
 }
 
 class _NoticeState extends State<Notice> {
+  final user;
+  _NoticeState(this.user);
+
+  bool show = true;
+  bool isWorking = true;
+  List notice = List();
+
+  @override
+  void initState() {
+    fetchNotice();
+    super.initState();
+  }
+
+  void fetchNotice() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString('token');
+    var result = await ApiService.getData('api/v1/notifications', token);
+    //print(result);
+    if (result.containsKey('data')) {
+      setState(() {
+        notice = result['data'] as List;
+        if (notice.length > 0) {
+          isWorking = false;
+        } else {
+          show = false;
+        }
+      });
+    } else {
+      setState(() {
+        isWorking = false;
+        show = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     Design mStyle = Design(context);
@@ -37,46 +76,96 @@ class _NoticeState extends State<Notice> {
           ),
         ], )
         ),
-        body: ListView(
-          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+        body: Stack(
           children: <Widget>[
-          
-            Card(
-              color: Colors.cyan[300],
-    child: Column(
-      mainAxisSize: MainAxisSize.max,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: <Widget>[
-        SizedBox(height: 5,),
-        const ListTile(
-          leading: Icon(Icons.notification_important, size: 50, color: Colors.white,),
-          title: Text('Wed Sep 25 2019 03:19:10 GMT+0000 (Coordinated Universal Time) Thanks all for signing up to Ecoconnect, we promise it will be a whole new experience for you all, please sign up for a training program that will expose you to all and more of what we are doing and the entire industry of waste recovery and the business of it all please follow this link to register https://bit.ly/MADE_WRA_Training Thanks Osayi Omokaro (admin)', 
-          style: TextStyle(color: Colors.white, height: 1.2, letterSpacing: 0.5) ,),
+            Padding(
+            padding: const EdgeInsets.all(10),
+            child: Container(
+                  height: mStyle.getheigth(val: 10),
+                  decoration: BoxDecoration(
+                      color: Theme.of(context).primaryColor,
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                            color: Theme.of(context).primaryColorLight,
+                            blurRadius: 5,
+                            offset: Offset(5, 10))
+                      ]),
+                  child: Center(
+                      child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Icon(
+                        Icons.notifications_active,
+                        color: Colors.white,
+                        size: 30,
+                      ),
+                      SizedBox(width: 10),
+                      Text(
+                        'Notifications',
+                        style: TextStyle(color: Colors.white, fontSize: 20),
+                      )
+                    ],
+                  ))),
           ),
-        SizedBox(height:5)
-      ],
-    ),
-  ),
-  Card(
-              color: Colors.cyan[300],
-    child: Column(
-      mainAxisSize: MainAxisSize.max,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: <Widget>[
-        SizedBox(height: 5,),
-        const ListTile(
-          leading: Icon(Icons.notification_important, size: 50, color: Colors.white,),
-          title: Text('Wed Sep 25 2019 03:19:10 GMT+0000 (Coordinated Universal Time) Thanks all for signing up to Ecoconnect, we promise it will be a whole new experience for you all, please sign up for a training program that will expose you to all and more of what we are doing and the entire industry of waste recovery and the business of it all please follow this link to register https://bit.ly/MADE_WRA_Training Thanks Osayi Omokaro (admin)', 
-          style: TextStyle(color: Colors.white, height: 1.2, letterSpacing: 0.5) ,),
-          ),
-        SizedBox(height:5)
-      ],
-    ),
-  ),
-          ],
-        ),
 
+            Container(
+               padding: EdgeInsets.only(top: 80),
+                  child:
+
+                   show  ?  
+                   
+                   Visibility(
+                     visible: isWorking,
+                     child:
+                      Center(
+                        child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                      ),
+                      replacement:
       
+      ListView.builder(
+        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+        shrinkWrap: true,
+        itemCount: notice.length,
+        itemBuilder: (BuildContext context, int index){
+          return Card(
+            color: Colors.cyan[300],
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                SizedBox(
+                  height: 5,
+                ),
+                ListTile(
+                  leading: Icon(
+                    Icons.local_shipping,
+                    size: 50,
+                    color: Colors.white,
+                  ),
+                  
+                  title: Text(notice[index]['time'] +' '+ notice[index]['message']+' \n '+ notice[index]['author'],
+                    style: TextStyle(
+                        color: Colors.white, height: 1.2, letterSpacing: 0.5),
+                  ),
+                ),
+                SizedBox(height: 5)
+              ],
+            ),
+          );
+          
+        },
+      ),
+      ): Image(
+                         height: MediaQuery.of(context).size.height,
+                         image: AssetImage('assets/image/noMsg.png'),
+                       )
+    )
+
+          ],
+        ) 
     );
   }
 }

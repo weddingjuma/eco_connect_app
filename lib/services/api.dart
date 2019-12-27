@@ -10,7 +10,7 @@ class ApiService {
     try{
     http.Response response = await http.post('${baseUrl}/${url}', body: data);
     Map jsonData = json.decode(response.body);
-    print(jsonData);
+   
     return jsonData;
     } catch (e){
       print(e);

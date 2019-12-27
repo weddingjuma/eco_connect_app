@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
         accentColor: _myColor.shade100,
         accentColorBrightness: Brightness.dark,
       ),
-      home: Login()
+      home: Splash()
     );
   }
 }

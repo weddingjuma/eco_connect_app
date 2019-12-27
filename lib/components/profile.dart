@@ -3,14 +3,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
 class Profile extends StatefulWidget {
+  final user;
+  Profile(this.user);
   @override
-  ProfileState createState() => ProfileState();
+  ProfileState createState() => ProfileState(this.user);
 }
 
 class ProfileState extends State<Profile>
     with SingleTickerProviderStateMixin {
   bool _status = true;
   final FocusNode myFocusNode = FocusNode();
+  final user;
+  ProfileState(this.user);
+  List<String> _state = ['Edo'];
+  List<String> _cities = ['Abudu', 'Afuze', 'Auchi', 'Benin City', 'Ekpoma', 'Ewu', 'Fugar', 'Ibillo', 'Igarra', 'Igueben', 'Irrua', 'Okpella', 'Sabongida-Ora', 'Ubiaja', 'Urhonigbe', 'Uromi', 'Uzebba'];
+  
+
+  String _selectedState;
+  String _selectedCity;
 
   @override
   void initState() {
@@ -73,7 +83,7 @@ class ProfileState extends State<Profile>
                                   shape: BoxShape.circle,
                                   image: new DecorationImage(
                                     image: new ExactAssetImage(
-                                        'assets/image/icon.png'),
+                                        'assets/image/avatar.png'),
                                     fit: BoxFit.cover,
                                   ),
                                 )),
@@ -118,19 +128,19 @@ class ProfileState extends State<Profile>
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 mainAxisSize: MainAxisSize.min,
                                 children: <Widget>[
-                                  new Text(
-                                    'Personal Information',
-                                    style: TextStyle(
-                                        fontSize: 18.0,
-                                        fontWeight: FontWeight.bold),
-                                  ),
+                                  // new Text(
+                                  //   'Personal Information',
+                                  //   style: TextStyle(
+                                  //       fontSize: 18.0, color: Colors.grey[900],
+                                  //       fontWeight: FontWeight.bold),
+                                  // ),
                                 ],
                               ),
                               new Column(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 mainAxisSize: MainAxisSize.min,
                                 children: <Widget>[
-                                  _status ? _getEditIcon() : new Container(),
+                                 // _status ? _getEditIcon() : new Container(),
                                 ],
                               )
                             ],
@@ -145,10 +155,11 @@ class ProfileState extends State<Profile>
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 mainAxisSize: MainAxisSize.min,
                                 children: <Widget>[
+                                  
                                   new Text(
-                                    'Name',
+                                    'First Name',
                                     style: TextStyle(
-                                        fontSize: 16.0,
+                                        fontSize: 16.0, color: Colors.grey[700],
                                         fontWeight: FontWeight.bold),
                                   ),
                                 ],
@@ -162,9 +173,10 @@ class ProfileState extends State<Profile>
                             mainAxisSize: MainAxisSize.max,
                             children: <Widget>[
                               new Flexible(
-                                child: new TextField(
+                                child: new TextFormField(
+                                  initialValue: user.firstname,
                                   decoration: const InputDecoration(
-                                    hintText: "Enter Your Name",
+                                    hintText: "Enter First Name",
                                   ),
                                   enabled: !_status,
                                   autofocus: !_status,
@@ -173,7 +185,7 @@ class ProfileState extends State<Profile>
                               ),
                             ],
                           )),
-                      Padding(
+                           Padding(
                           padding: EdgeInsets.only(
                               left: 25.0, right: 25.0, top: 25.0),
                           child: new Row(
@@ -184,9 +196,9 @@ class ProfileState extends State<Profile>
                                 mainAxisSize: MainAxisSize.min,
                                 children: <Widget>[
                                   new Text(
-                                    'Email ID',
+                                    'Last Name',
                                     style: TextStyle(
-                                        fontSize: 16.0,
+                                        fontSize: 16.0, color: Colors.grey[700],
                                         fontWeight: FontWeight.bold),
                                   ),
                                 ],
@@ -200,9 +212,46 @@ class ProfileState extends State<Profile>
                             mainAxisSize: MainAxisSize.max,
                             children: <Widget>[
                               new Flexible(
-                                child: new TextField(
+                                child: new TextFormField(
+                                  initialValue: user.lastname,
                                   decoration: const InputDecoration(
-                                      hintText: "Enter Email ID"),
+                                      hintText: "Enter Last Name"),
+                                  enabled: !_status,
+                                ),
+                              ),
+                            ],
+                          )),
+                          Padding(
+                          padding: EdgeInsets.only(
+                              left: 25.0, right: 25.0, top: 25.0),
+                          child: new Row(
+                            mainAxisSize: MainAxisSize.max,
+                            children: <Widget>[
+                              new Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: <Widget>[
+                                  new Text(
+                                    'Phone Number',
+                                    style: TextStyle(
+                                        fontSize: 16.0, color: Colors.grey[700],
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          )),
+                      Padding(
+                          padding: EdgeInsets.only(
+                              left: 25.0, right: 25.0, top: 2.0),
+                          child: new Row(
+                            mainAxisSize: MainAxisSize.max,
+                            children: <Widget>[
+                              new Flexible(
+                                child: new TextFormField(
+                                  initialValue: user.phone,
+                                  decoration: const InputDecoration(
+                                      hintText: "Enter Phone Number"),
                                   enabled: !_status,
                                 ),
                               ),
@@ -219,9 +268,9 @@ class ProfileState extends State<Profile>
                                 mainAxisSize: MainAxisSize.min,
                                 children: <Widget>[
                                   new Text(
-                                    'Mobile',
+                                    'Email Address',
                                     style: TextStyle(
-                                        fontSize: 16.0,
+                                        fontSize: 16.0, color: Colors.grey[700],
                                         fontWeight: FontWeight.bold),
                                   ),
                                 ],
@@ -235,14 +284,16 @@ class ProfileState extends State<Profile>
                             mainAxisSize: MainAxisSize.max,
                             children: <Widget>[
                               new Flexible(
-                                child: new TextField(
+                                child: new TextFormField(
+                                  initialValue: user.email,
                                   decoration: const InputDecoration(
-                                      hintText: "Enter Mobile Number"),
+                                      hintText: "Enter Email Address"),
                                   enabled: !_status,
                                 ),
                               ),
                             ],
                           )),
+                     
                       Padding(
                           padding: EdgeInsets.only(
                               left: 25.0, right: 25.0, top: 25.0),
@@ -253,9 +304,9 @@ class ProfileState extends State<Profile>
                               Expanded(
                                 child: Container(
                                   child: new Text(
-                                    'Pin Code',
+                                    'City',
                                     style: TextStyle(
-                                        fontSize: 16.0,
+                                        fontSize: 16.0, color: Colors.grey[700],
                                         fontWeight: FontWeight.bold),
                                   ),
                                 ),
@@ -266,7 +317,7 @@ class ProfileState extends State<Profile>
                                   child: new Text(
                                     'State',
                                     style: TextStyle(
-                                        fontSize: 16.0,
+                                        fontSize: 16.0, color: Colors.grey[700],
                                         fontWeight: FontWeight.bold),
                                   ),
                                 ),
@@ -284,20 +335,70 @@ class ProfileState extends State<Profile>
                               Flexible(
                                 child: Padding(
                                   padding: EdgeInsets.only(right: 10.0),
-                                  child: new TextField(
-                                    decoration: const InputDecoration(
-                                        hintText: "Enter Pin Code"),
-                                    enabled: !_status,
-                                  ),
+                                  child: DropdownButtonHideUnderline( 
+                          child: DropdownButton(
+                          isExpanded: true,
+                      value:_selectedCity,
+                      hint: Text(user.city,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 15,
+                             )),
+                      style: TextStyle(
+                        fontSize: 15,
+                          color: Colors.grey),
+                      onChanged: (newValue) {
+                        
+                        setState(() {
+                          _selectedCity = newValue;   
+                        });
+                      },
+                      items: _cities.map((city) {
+                        return DropdownMenuItem(
+                          child: new Text(
+                            city,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          value: city,
+                        );
+                      }).toList(),
+                    ),),
                                 ),
                                 flex: 2,
                               ),
                               Flexible(
-                                child: new TextField(
-                                  decoration: const InputDecoration(
-                                      hintText: "Enter State"),
-                                  enabled: !_status,
-                                ),
+                                child: DropdownButtonHideUnderline( 
+                          child: DropdownButton(
+                          isExpanded: true,
+                      value:_selectedState,
+                      hint: Text(user.state,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 15,
+                             )),
+                      style: TextStyle(
+                        fontSize: 15,
+                          color: Colors.grey),
+                      onChanged: (newValue) {
+                        
+                        setState(() {
+                          _selectedState = newValue;
+                        });
+                      },
+                      items: _state.map((state) {
+                        return DropdownMenuItem(
+                          child: new Text(
+                            state,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          value: state,
+                        );
+                      }).toList(),
+                    ),),
                                 flex: 2,
                               ),
                             ],
@@ -335,7 +436,7 @@ class ProfileState extends State<Profile>
                   child: new RaisedButton(
                 child: new Text("Save"),
                 textColor: Colors.white,
-                color: Colors.green,
+                color: Theme.of(context).primaryColor,
                 onPressed: () {
                   setState(() {
                     _status = true;

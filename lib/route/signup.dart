@@ -1,6 +1,10 @@
 import 'package:eco_connect_app/classes/custom-clip.dart';
+import 'package:eco_connect_app/model/User.dart';
 import 'package:eco_connect_app/model/design.dart';
+import 'package:eco_connect_app/route/index.dart';
+import 'package:eco_connect_app/route/login.dart';
 import 'package:eco_connect_app/services/api.dart';
+import 'package:eco_connect_app/services/storage.dart';
 import 'package:flutter/material.dart';
 
 class Signup extends StatefulWidget {
@@ -87,10 +91,12 @@ class _SignupState extends State<Signup> {
         print(data);
         var result = await ApiService.postData(data, 'api/v1/signup');
          if (result.containsKey('data')) {
-           print(result);
-          // Navigator.push(context, MaterialPageRoute(
-          //   builder: (context)=> Dashboard(user)
-          // ));
+          Storage.savetoken(result['token'].toString());
+          final user = new User.fromJson(result['data']);
+
+          Navigator.of(context).pushReplacement(MaterialPageRoute(
+            builder: (context) => Index(user),
+          ));
         } else {
           _isNotLoading();
           showInSnackBar(result['error'].toString());
@@ -140,7 +146,7 @@ class _SignupState extends State<Signup> {
               mainAxisSize: MainAxisSize.max,
               children: <Widget>[
                 Text(
-                  "Create an Account",
+                  "Registration",
                   style: TextStyle(
                       fontSize: 18, color: Theme.of(context).primaryColor),
                 ),
@@ -416,12 +422,18 @@ class _SignupState extends State<Signup> {
                 SizedBox(
                   height: mStyle.getheigth(val: 5),
                 ),
-                Center(
-                    child: Text('SignIn Instead?',
+                GestureDetector(
+                  onTap: () =>  Navigator.of(context).pushReplacement(MaterialPageRoute(
+            builder: (context) => Login(),
+          )),
+                  child: Center(
+                    child: Text('Login Instead?',
                         style: TextStyle(
                             color: Colors.grey[600],
                             fontSize: 17,
                             fontWeight: FontWeight.bold))),
+                )
+                
               ],
             ),
               )

@@ -3,13 +3,19 @@ import 'package:eco_connect_app/components/history.dart';
 import 'package:eco_connect_app/components/notice.dart';
 import 'package:eco_connect_app/components/profile.dart';
 import 'package:eco_connect_app/components/waste.dart';
-import 'package:fancy_bottom_navigation/fancy_bottom_navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:titled_navigation_bar/titled_navigation_bar.dart';
 
 class Index extends StatefulWidget {
+  final user;
+  Index(this.user);
+
+
   @override
-  _IndexState createState() => _IndexState();
+  State<StatefulWidget> createState()  {
+    return _IndexState(this.user);
+    }
+  
 }
 
 class _IndexState extends State<Index> with SingleTickerProviderStateMixin {
@@ -21,16 +27,28 @@ class _IndexState extends State<Index> with SingleTickerProviderStateMixin {
   Waste waste;
   List trans = List();
 
+  
+  _IndexState(this.user);
+  final user;
+  
+
   List<Widget> pages;
   Widget currentPage;
 
+
+
+  
+
+
+
   @override
   void initState() {
-    dashboard = Dashboard();
-    profile = Profile();
-    history = History();
-    notice = Notice();
-    waste = Waste();
+
+    dashboard = Dashboard(user);
+    profile = Profile(user);
+    history = History(user);
+    notice = Notice(user);
+    waste = Waste(user);
     pages = [dashboard, profile, history, notice];
 
     currentPage = dashboard;

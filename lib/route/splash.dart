@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:eco_connect_app/model/design.dart';
 import 'package:eco_connect_app/route/login.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +10,16 @@ class Splash extends StatefulWidget {
 }
 
 class _SplashState extends State<Splash> { 
+
+  @override
+  void initState() {
+    Timer(Duration(seconds: 3), ()=> Navigator.of(context).pushReplacement(MaterialPageRoute(
+            builder: (context) => Login(),
+          )));
+    super.initState();
+  }
+
+
   @override
   Widget build(BuildContext context) {
     Design mStyle = new Design(context);
@@ -45,18 +57,24 @@ class _SplashState extends State<Splash> {
               Container(
                 height: mStyle.getheigth(val: 50),
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    RaisedButton.icon(
-                      onPressed: () {
+                    
+                    // RaisedButton.icon(
+                    //   onPressed: () {
                         
-                      },
-                      shape: StadiumBorder(),
-                      icon: Icon(Icons.account_circle),
-                      label: Text(
-                        'SignIn',
-                      ),
-                      color: Theme.of(context).indicatorColor,
-                      textColor: Colors.white,
+                    //   },
+                    //   shape: StadiumBorder(),
+                    //   icon: Icon(Icons.account_circle),
+                    //   label: Text(
+                    //     'SignIn',
+                    //   ),
+                    //   color: Theme.of(context).indicatorColor,
+                    //   textColor: Colors.white,
+                    // ),
+                    CircularProgressIndicator(
+                      strokeWidth: 2,
+                      backgroundColor: Colors.white,
                     ),
 //                  
                   ],
