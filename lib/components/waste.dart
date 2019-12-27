@@ -57,11 +57,10 @@ class _WasteState extends State<Waste> {
       _isLoading();
       _formKey.currentState.save();
 
-      final data = {'waste': _selectedWaste, 'address': 'null', 'image': _address};
+      final data = {'waste': _selectedWaste, 'address': _address, 'image': _address};
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String token = prefs.getString('token');
-      print(data);
-
+     
       var result = await ApiService.postDataWithToken(
           data, 'api/v1/request/pickup', token);
          
