@@ -1,4 +1,4 @@
-package com.example.eco_connect_app
+package com.dev.ecoconnect
 
 import android.os.Bundle
 
