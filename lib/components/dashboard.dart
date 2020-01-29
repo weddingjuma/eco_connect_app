@@ -140,8 +140,8 @@ class _DashboardState extends State<Dashboard>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>
                     [
-                      Text('Earned Point', style: TextStyle(color: Colors.grey[700])),
-                      Text('0', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700, fontSize: 34.0))
+                      Text('Earnings', style: TextStyle(color: Colors.grey[700])),
+                      Text('₦0', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700, fontSize: 34.0))
                     ],
                   ),
                   Material
